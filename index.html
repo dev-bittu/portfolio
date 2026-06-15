@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bittu Kumar Goswami — Full Stack / Django Developer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0D1117;
+    --surface: #161B22;
+    --surface-2: #1C2128;
+    --text: #E6EDF3;
+    --muted: #8B949E;
+    --accent: #3FB950;
+    --accent-dim: #2EA043;
+    --border: #30363D;
+    --red: #F85149;
+    --yellow: #D29922;
+    --blue: #58A6FF;
+    --shadow: 0 8px 24px rgba(0,0,0,0.4);
+  }
+
+  [data-theme="light"] {
+    --bg: #F6F8FA;
+    --surface: #FFFFFF;
+    --surface-2: #EAEEF2;
+    --text: #1F2328;
+    --muted: #656D76;
+    --accent: #1A7F37;
+    --accent-dim: #2DA44E;
+    --border: #D0D7DE;
+    --red: #CF222E;
+    --yellow: #9A6700;
+    --blue: #0969DA;
+    --shadow: 0 8px 24px rgba(31,35,40,0.08);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    line-height: 1.6;
+    transition: background 0.3s ease, color 0.3s ease;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .mono { font-family: 'JetBrains Mono', monospace; }
+
+  /* ===== Top Bar ===== */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 24px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .dots { display: flex; gap: 6px; }
+  .dot { width: 11px; height: 11px; border-radius: 50%; }
+  .dot.red { background: var(--red); }
+  .dot.yellow { background: var(--yellow); }
+  .dot.green { background: var(--accent); }
+  .topbar-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--muted);
+    margin-left: 6px;
+  }
+  .topbar-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  .btn {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--text);
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .btn:focus-visible, a:focus-visible, .toggle:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  .btn.primary {
+    background: var(--accent);
+    color: #0D1117;
+    border-color: var(--accent);
+  }
+  .btn.primary:hover {
+    background: var(--accent-dim);
+    color: #0D1117;
+    opacity: 0.95;
+  }
+  .toggle {
+    width: 40px;
+    height: 24px;
+    border-radius: 12px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    position: relative;
+    transition: background 0.2s ease;
+    flex-shrink: 0;
+  }
+  .toggle-knob {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--accent);
+    transition: transform 0.2s ease;
+  }
+  [data-theme="light"] .toggle-knob { transform: translateX(16px); }
+
+  /* ===== Container ===== */
+  .wrap {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 48px 24px 100px;
+  }
+
+  /* ===== Hero / Terminal ===== */
+  .hero {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    margin-bottom: 48px;
+  }
+  .hero-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface-2);
+  }
+  .hero-bar span.path {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    margin-left: 8px;
+  }
+  .hero-body {
+    padding: 32px 28px 36px;
+  }
+  .prompt-line {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .prompt-line .sym { color: var(--accent); }
+  h1.name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: clamp(28px, 6vw, 46px);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin: 10px 0 6px;
+  }
+  .cursor {
+    display: inline-block;
+    width: 0.5em;
+    background: var(--accent);
+    margin-left: 4px;
+    animation: blink 1s step-end infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+  .role-line {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 15px;
+    color: var(--accent);
+    margin-bottom: 18px;
+  }
+  .status-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 22px;
+  }
+  .status-row .pulse {
+    display: inline-block;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    margin-right: 6px;
+    box-shadow: 0 0 0 0 rgba(63,185,80,0.5);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(63,185,80,0.45); }
+    70% { box-shadow: 0 0 0 6px rgba(63,185,80,0); }
+    100% { box-shadow: 0 0 0 0 rgba(63,185,80,0); }
+  }
+  .links-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .links-row a {
+    color: var(--text);
+    text-decoration: none;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    border: 1px solid var(--border);
+    padding: 7px 12px;
+    border-radius: 6px;
+    transition: all 0.15s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .links-row a:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* ===== Sections ===== */
+  section { margin-bottom: 52px; }
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 22px;
+  }
+  .section-head .tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 3px 8px;
+  }
+  .section-head h2 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 22px;
+    font-weight: 700;
+  }
+  .section-head::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ===== Experience (service log) ===== */
+  .log-entry {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    margin-bottom: 18px;
+    overflow: hidden;
+  }
+  .log-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface-2);
+  }
+  .log-head .role {
+    font-weight: 700;
+    font-size: 16px;
+  }
+  .log-head .org {
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    margin-top: 2px;
+  }
+  .log-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    text-align: right;
+  }
+  .log-body { padding: 16px 20px 20px; }
+  .log-body p.desc {
+    color: var(--muted);
+    font-size: 14px;
+    margin-bottom: 14px;
+  }
+  .log-body ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .log-body li {
+    font-size: 14px;
+    padding-left: 22px;
+    position: relative;
+  }
+  .log-body li::before {
+    content: '$';
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+  }
+  .log-body li b { color: var(--text); }
+
+  /* ===== Skills ===== */
+  .skill-group {
+    margin-bottom: 18px;
+  }
+  .skill-group h3 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--accent);
+    margin-bottom: 10px;
+    font-weight: 600;
+  }
+  .chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .chip {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    padding: 6px 12px;
+    border-radius: 6px;
+    color: var(--text);
+  }
+
+  /* ===== Projects (repo cards) ===== */
+  .repo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+  }
+  .repo-card {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    padding: 18px;
+    transition: border-color 0.15s ease;
+  }
+  .repo-card:hover { border-color: var(--accent); }
+  .repo-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .repo-name .icon { color: var(--muted); font-size: 14px; }
+  .repo-card p.desc {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+  .repo-card ul {
+    list-style: none;
+    font-size: 12.5px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .repo-card li {
+    padding-left: 18px;
+    position: relative;
+    color: var(--text);
+  }
+  .repo-card li::before {
+    content: '+';
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+  }
+
+  /* ===== Achievements ===== */
+  .ach-item {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    padding: 18px 20px;
+    margin-bottom: 14px;
+    display: flex;
+    gap: 14px;
+  }
+  .ach-icon {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--accent);
+    font-weight: 800;
+    font-size: 14px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .ach-text .title { font-weight: 700; margin-bottom: 4px; font-size: 14.5px; }
+  .ach-text .body { font-size: 13.5px; color: var(--muted); }
+
+  /* ===== Education ===== */
+  .edu-item {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    padding: 16px 20px;
+    margin-bottom: 12px;
+  }
+  .edu-item .deg { font-weight: 700; font-size: 14.5px; }
+  .edu-item .org { color: var(--accent); font-family: 'JetBrains Mono', monospace; font-size: 13px; margin-top: 2px; }
+  .edu-item .when { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--muted); white-space: nowrap; }
+
+  /* ===== Footer ===== */
+  footer {
+    border-top: 1px solid var(--border);
+    padding-top: 24px;
+    text-align: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  /* ===== Responsive ===== */
+  @media (max-width: 600px) {
+    .topbar-title { display: none; }
+    .hero-body { padding: 24px 18px 28px; }
+    .wrap { padding: 32px 16px 80px; }
+    .log-head { flex-direction: column; }
+    .log-meta { text-align: left; }
+  }
+
+  /* ===== Reduced motion ===== */
+  @media (prefers-reduced-motion: reduce) {
+    .cursor { animation: none; }
+    .status-row .pulse { animation: none; }
+    html { scroll-behavior: auto; }
+  }
+
+  /* ===== Print (PDF export tuning) ===== */
+  @media print {
+    .topbar-actions .btn, .toggle { display: none !important; }
+    body { background: #fff !important; color: #1F2328 !important; }
+  }
+</style>
+</head>
+<body data-theme="dark">
+
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="dots">
+        <div class="dot red"></div>
+        <div class="dot yellow"></div>
+        <div class="dot green"></div>
+      </div>
+      <span class="topbar-title mono">bittu@portfolio: ~/profile</span>
+    </div>
+    <div class="topbar-actions">
+      <button class="btn primary" id="downloadBtn">⬇ Download Resume</button>
+      <button class="toggle" id="themeToggle" aria-label="Toggle dark and light theme">
+        <div class="toggle-knob"></div>
+      </button>
+    </div>
+  </div>
+
+  <div class="wrap" id="resumeContent">
+
+    <!-- HERO -->
+    <div class="hero">
+      <div class="hero-bar">
+        <div class="dots">
+          <div class="dot red"></div>
+          <div class="dot yellow"></div>
+          <div class="dot green"></div>
+        </div>
+        <span class="path">~/profile/whoami.sh</span>
+      </div>
+      <div class="hero-body">
+        <div class="prompt-line"><span class="sym">$</span> whoami</div>
+        <h1 class="name" id="typedName">Bittu Kumar Goswami<span class="cursor">&nbsp;</span></h1>
+        <div class="role-line">&gt; Software Developer · Full Stack · Django Developer</div>
+        <div class="status-row">
+          <span><span class="pulse"></span>status: open to opportunities</span>
+          <span>📍 Nangli, Delhi</span>
+          <span>📞 9310723175</span>
+        </div>
+        <div class="links-row">
+          <a href="mailto:thedevbittu@gmail.com">✉ thedevbittu@gmail.com</a>
+          <a href="https://github.com/dev-bittu" target="_blank" rel="noopener">⌥ github.com/dev-bittu</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- EXPERIENCE -->
+    <section id="experience">
+      <div class="section-head">
+        <span class="tag">log</span>
+        <h2>Experience</h2>
+      </div>
+
+      <div class="log-entry">
+        <div class="log-head">
+          <div>
+            <div class="role">Full Stack Developer</div>
+            <div class="org">Shipzee — Courier Aggregator Platform</div>
+          </div>
+          <div class="log-meta">12/2025 — Present<br>Dwarka, Delhi</div>
+        </div>
+        <div class="log-body">
+          <p class="desc">Courier aggregator integrating multiple logistics providers into a unified system — comparing rates, managing shipments, tracking deliveries, and automating order fulfillment at scale.</p>
+          <ul>
+            <li>Designed and built the complete end-to-end <b>courier aggregator platform</b> using Django.</li>
+            <li>Integrated multiple courier partners for shipment creation, tracking, and status updates.</li>
+            <li>Implemented authentication, <b>role-based access control</b>, and order lifecycle management.</li>
+            <li>Built responsive, production-ready UI using Django + Tailwind for internal and client portals.</li>
+            <li>Managed database design, migrations, and performance optimization.</li>
+            <li>Architected the system to handle <b>thousands of shipments per day</b> with optimized queries and background tasks.</li>
+            <li>Integrated the <b>PhonePe</b> payment gateway.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="log-entry">
+        <div class="log-head">
+          <div>
+            <div class="role">Full Stack Developer (Freelance)</div>
+            <div class="org">Shubhovastra — Print-on-Demand Platform</div>
+          </div>
+          <div class="log-meta">Freelance</div>
+        </div>
+        <div class="log-body">
+          <p class="desc">Print-on-demand platform letting users create custom product mockups, connect online stores, and automate order printing and fulfillment — similar to Qikink and Printify.</p>
+          <ul>
+            <li>Designed and developed a <b>print-on-demand platform</b> for product mockups and order management.</li>
+            <li>Built functionality to <b>connect user stores</b> and sync orders to the platform automatically.</li>
+            <li>Developed backend APIs and frontend workflows for product creation, order flow, and fulfillment status.</li>
+            <li>Built a Shopify app to integrate store products and receive real-time order data.</li>
+            <li>Integrated <b>Razorpay</b> for secure payment processing.</li>
+            <li>Managed database design, order mapping, and automation logic for seamless reflection across the platform.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROJECTS -->
+    <section id="projects">
+      <div class="section-head">
+        <span class="tag">repos</span>
+        <h2>Projects</h2>
+      </div>
+      <div class="repo-grid">
+        <div class="repo-card">
+          <div class="repo-name"><span class="icon">▣</span> DJCMS</div>
+          <p class="desc">Django-based content management system for articles, images, and videos.</p>
+          <ul>
+            <li>CRUD operations with user authentication</li>
+            <li>Image uploads, video embeds, and tagging</li>
+            <li>Responsive UI with commenting and categories</li>
+          </ul>
+        </div>
+        <div class="repo-card">
+          <div class="repo-name"><span class="icon">▣</span> QuizApp</div>
+          <p class="desc">Quiz platform for creating and taking quizzes.</p>
+          <ul>
+            <li>Quiz creation and participation with user accounts</li>
+            <li>Leaderboards and performance tracking</li>
+            <li>Dynamic educational content management</li>
+          </ul>
+        </div>
+        <div class="repo-card">
+          <div class="repo-name"><span class="icon">▣</span> QuizApp-Flask</div>
+          <p class="desc">Flask-based quiz app for collaborative learning.</p>
+          <ul>
+            <li>User registration, quiz creation, peer interaction</li>
+            <li>Persistent database with Flask-SQLAlchemy</li>
+            <li>Clean, user-friendly interface</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- SKILLS -->
+    <section id="skills">
+      <div class="section-head">
+        <span class="tag">stack</span>
+        <h2>Skills</h2>
+      </div>
+
+      <div class="skill-group">
+        <h3>// Languages</h3>
+        <div class="chip-row">
+          <span class="chip">Python</span><span class="chip">JavaScript</span><span class="chip">TypeScript</span><span class="chip">Java / Kotlin</span>
+        </div>
+      </div>
+      <div class="skill-group">
+        <h3>// Backend &amp; Web Frameworks</h3>
+        <div class="chip-row">
+          <span class="chip">Django</span><span class="chip">DRF</span><span class="chip">FastAPI</span><span class="chip">Next.js</span><span class="chip">Shopify App Development</span>
+        </div>
+      </div>
+      <div class="skill-group">
+        <h3>// Frontend &amp; UI</h3>
+        <div class="chip-row">
+          <span class="chip">HTML &amp; CSS</span><span class="chip">Tailwind CSS</span><span class="chip">Bootstrap</span>
+        </div>
+      </div>
+      <div class="skill-group">
+        <h3>// DevOps, Cloud &amp; Deployment</h3>
+        <div class="chip-row">
+          <span class="chip">Linux</span><span class="chip">Git &amp; GitHub</span><span class="chip">CI/CD Pipelines</span><span class="chip">AWS</span><span class="chip">Sentry</span>
+        </div>
+      </div>
+      <div class="skill-group">
+        <h3>// Tools &amp; Platforms</h3>
+        <div class="chip-row">
+          <span class="chip">Postman</span><span class="chip">VS Code</span><span class="chip">Excel</span><span class="chip">WordPress</span><span class="chip">Shopify</span>
+        </div>
+      </div>
+      <div class="skill-group">
+        <h3>// Integrations</h3>
+        <div class="chip-row">
+          <span class="chip">Razorpay</span><span class="chip">PhonePe</span><span class="chip">Shopify</span><span class="chip">Xpressbees &amp; Shiprocket</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ACHIEVEMENTS -->
+    <section id="achievements">
+      <div class="section-head">
+        <span class="tag">awards</span>
+        <h2>Key Achievements</h2>
+      </div>
+      <div class="ach-item">
+        <div class="ach-icon">★</div>
+        <div class="ach-text">
+          <div class="title">School-Level Hackathon — Finalist</div>
+          <div class="body">Cleared all stages and reached the finals, achieving a perfect score in Python in one challenge. Strengthened problem-solving and coding skills under time constraints.</div>
+        </div>
+      </div>
+      <div class="ach-item">
+        <div class="ach-icon">★</div>
+        <div class="ach-text">
+          <div class="title">IIT Kanpur Hackathon — Finalist</div>
+          <div class="body">Cleared all five stages and participated in the 3-day onsite finale at IIT Kanpur. Gained hands-on experience in teamwork, programming, and solving complex problems under pressure.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- EDUCATION -->
+    <section id="education">
+      <div class="section-head">
+        <span class="tag">edu</span>
+        <h2>Education</h2>
+      </div>
+      <div class="edu-item">
+        <div>
+          <div class="deg">Bachelor of Computer Applications</div>
+          <div class="org">IGNOU</div>
+        </div>
+        <div class="when">07/2024 — Present</div>
+      </div>
+      <div class="edu-item">
+        <div>
+          <div class="deg">10th &amp; 12th</div>
+          <div class="org">Rajkiya Pratibha Vikas Vidyalaya, Sector-10</div>
+        </div>
+        <div class="when">2020 — 2024</div>
+      </div>
+    </section>
+
+    <footer>
+      &copy; 2026 Bittu Kumar Goswami — built with Django energy, served as static HTML.
+    </footer>
+
+  </div>
+
+<script>
+  // Theme toggle
+  const themeToggle = document.getElementById('themeToggle');
+  const body = document.body;
+
+  function applyTheme(theme) {
+    body.setAttribute('data-theme', theme);
+    localStorage.setItem('portfolio-theme', theme);
+  }
+
+  const saved = localStorage.getItem('portfolio-theme');
+  if (saved) applyTheme(saved);
+  else if (window.matchMedia('(prefers-color-scheme: light)').matches) applyTheme('light');
+
+  themeToggle.addEventListener('click', () => {
+    const current = body.getAttribute('data-theme');
+    applyTheme(current === 'dark' ? 'light' : 'dark');
+  });
+
+  // PDF download (renders the page content to PDF)
+  document.getElementById('downloadBtn').addEventListener('click', async function () {
+    const btn = this;
+    const original = btn.textContent;
+    btn.textContent = '⏳ Generating PDF...';
+    btn.disabled = true;
+
+    const target = document.getElementById('resumeContent');
+
+    try {
+      const canvas = await html2canvas(target, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: getComputedStyle(body).getPropertyValue('--bg').trim(),
+      });
+
+      const imgData = canvas.toDataURL('image/jpeg', 0.95);
+      const { jsPDF } = window.jspdf;
+
+      const pdfWidth = 210; // A4 width mm
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pageHeight = 297;
+      let heightLeft = pdfHeight;
+      let position = 0;
+
+      pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, pdfHeight);
+      heightLeft -= pageHeight;
+
+      while (heightLeft > 0) {
+        position = heightLeft - pdfHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, pdfHeight);
+        heightLeft -= pageHeight;
+      }
+
+      pdf.save('Bittu_Kumar_Goswami_Resume.pdf');
+    } catch (err) {
+      console.error(err);
+      alert('Sorry, something went wrong generating the PDF. Please try again.');
+    } finally {
+      btn.textContent = original;
+      btn.disabled = false;
+    }
+  });
+
+  // Typing cursor blink already handled via CSS; just remove typing if reduced motion
+</script>
+</body>
+</html>
